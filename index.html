@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Untitled</title>
+
+		<meta name="description" content="Website description here.">
+		
+		<link href="./css/style.css" rel="stylesheet" type="text/css">
+	</head>
+	<body>
+		<script src="https://www.gstatic.com/firebasejs/3.6.1/firebase.js"></script>
+
+		<script src="./js/firebaseInit.js"></script>
+
+		<script src="https://www.gstatic.com/firebasejs/3.6.1/firebase-app.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/3.6.1/firebase-auth.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/3.6.1/firebase-database.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/3.6.1/firebase-messaging.js"></script>
+		
+		<!-- Leave out Storage -->
+		<!-- <script src="https://www.gstatic.com/firebasejs/3.6.1/firebase-storage.js"></script> -->
+		
+		<script>
+			// Initialize the default app
+			firebase.initializeApp(config); // config var defined in js/firebaseInit.js
+			
+			/*
+			// Initialize another app with a different config
+			var otherApp = firebase.initializeApp(otherAppConfig, "other");
+			
+			console.log(firebase.app().name);  // "[DEFAULT]"
+			console.log(otherApp.name);        // "other"
+			
+			// Use the shorthand notation to retrieve the default app's services
+			var defaultStorage = firebase.storage();
+			var defaultDatabase = firebase.database();
+			
+			// Use the otherApp variable to retrieve the other app's services
+			var otherStorage = otherApp.storage();
+			var otherDatabase = otherApp.database();
+			*/
+		</script>
+	</body>
+</html>
