@@ -13,8 +13,8 @@
 	<body>
 		<script src="https://www.gstatic.com/firebasejs/3.6.1/firebase.js"></script>
 
-		<script src="./js/firebaseInit.js"></script>
-		<script src="./js/user.js"></script>
+		<script src="./js/data/firebaseInit.js"></script>
+		<script src="./js/data/user.js"></script>
 
 		<script src="https://www.gstatic.com/firebasejs/3.6.1/firebase-app.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/3.6.1/firebase-auth.js"></script>
@@ -26,8 +26,7 @@
 		
 		<script>
 			// Initialize the default app
-			firebase.initializeApp(config); // config var defined in js/firebaseInit.js
-			
+			var myapp = firebase.initializeApp(config, "myapp"); // config var defined in js/firebaseInit.js
 			/*
 			// Initialize another app with a different config
 			var otherApp = firebase.initializeApp(otherAppConfig, "other");
@@ -50,6 +49,7 @@
 			  // Handle Errors here.
 			  var errorCode = error.code;
 			  var errorMessage = error.message;
+			  console.log(error)
 			  // ...
 			});
 			
