@@ -25,8 +25,28 @@
 		<!-- <script src="https://www.gstatic.com/firebasejs/3.6.1/firebase-storage.js"></script> -->
 		
 		<script>
+			//Returns a new Firebase reference
+			var apps = false; //Holds all initialised dbs
+			
+			var appInit = function appInit(param){
+				var ref = null;
+				
+				if (apps === false){
+					apps = {};
+				}
+				if (!apps[param.databaseURL]){
+					ref = firebase.initializeApp(param, param.databaseURL);
+					apps[param.databaseURL] = {ref: ref};
+				}
+				/*
+				NOTE: 
+				There is no "default" db
+				*/
+			};
+			
 			// Initialize the default app
-			var myapp = firebase.initializeApp(config, "myapp"); // config var defined in js/firebaseInit.js
+			appInit(config); //var config defined in js/firebaseInit.js
+			
 			/*
 			// Initialize another app with a different config
 			var otherApp = firebase.initializeApp(otherAppConfig, "other");
@@ -45,7 +65,7 @@
 			
 			//email and password vars defined in user.js
 			//Create user
-			firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+			apps[config.databaseURL].ref.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
 			  // Handle Errors here.
 			  var errorCode = error.code;
 			  var errorMessage = error.message;
@@ -54,7 +74,7 @@
 			});
 			
 			//Sign in
-			firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+			apps[config.databaseURL].ref.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
 				// Handle Errors here.
 				var errorCode = error.code;
 				var errorMessage = error.message;
@@ -62,7 +82,7 @@
 			});
 			
 			//Sign out
-			firebase.auth().signOut().then(function() {
+			apps[config.databaseURL].ref.auth().signOut().then(function() {
 												// Sign-out successful.
 												console.log("Signed out.")
 											},
