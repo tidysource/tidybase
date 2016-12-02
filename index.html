@@ -68,14 +68,12 @@
 			});
 			
 			viewUser(config.databaseURL, function (user){
-				firebase.auth().onAuthStateChanged(function(user) {
-				  if (user){
-				    console.log("logged in:", user)
-				  } 
-				  else{
-				    console.log("logged out")
-				  }
-				});
+				if (user){
+					console.log("logged in:", user)
+				} 
+				else{
+					console.log("logged out")
+				}
 			});
 			
 			//email and password vars defined in user.js
