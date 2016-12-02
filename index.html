@@ -48,13 +48,14 @@
 			appInit(config); //var config defined in js/firebaseInit.js
 			
 			var getUser = function getUser(dbURL, callback){
-				apps[dbURL].ref.auth().onAuthStateChanged(function(user) {
-					callback(user);
-				})
+				var user = apps[dbURL].ref.auth().currentUser;
+				callback(user);
 			};
 			
 			var viewUser = function viewUser(dbURL, callback){
-				var user = apps[dbURL].ref.auth().currentUser;
+				apps[dbURL].ref.auth().onAuthStateChanged(function(user) {
+					callback(user);
+				})
 			};
 			
 			getUser(config.databaseURL, function (user){
@@ -67,29 +68,15 @@
 			});
 			
 			viewUser(config.databaseURL, function (user){
-				if (user){
-					console.log("logged in view:", user)
-				}
-				else{
-					console.log("logged out view")
-				}
+				firebase.auth().onAuthStateChanged(function(user) {
+				  if (user){
+				    console.log("logged in:", user)
+				  } 
+				  else{
+				    console.log("logged out")
+				  }
+				});
 			});
-			
-			/*
-			// Initialize another app with a different config
-			var otherApp = firebase.initializeApp(otherAppConfig, "other");
-			
-			console.log(firebase.app().name);  // "[DEFAULT]"
-			console.log(otherApp.name);        // "other"
-			
-			// Use the shorthand notation to retrieve the default app's services
-			var defaultStorage = firebase.storage();
-			var defaultDatabase = firebase.database();
-			
-			// Use the otherApp variable to retrieve the other app's services
-			var otherStorage = otherApp.storage();
-			var otherDatabase = otherApp.database();
-			*/
 			
 			//email and password vars defined in user.js
 			//Create user
