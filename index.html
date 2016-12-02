@@ -76,6 +76,26 @@
 				}
 			});
 			
+						
+			var updateUser = function updateUser(obj){
+				getUser(config.databaseURL, function(user){
+					if (user){
+						user.updateProfile(obj)
+							.then(
+								function(){	
+									//Success
+									console.log("updated")
+								}, 
+								function(error){	
+									//Error
+									console.log("Update failed")
+							});
+					}
+				});
+			};
+			
+			updateUser({displayName: "Tidy Source"})
+			
 			//email and password vars defined in user.js
 			//Create user
 			apps[config.databaseURL].ref.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
