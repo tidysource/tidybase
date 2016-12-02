@@ -47,6 +47,34 @@
 			// Initialize the default app
 			appInit(config); //var config defined in js/firebaseInit.js
 			
+			var getUser = function getUser(dbURL, callback){
+				apps[dbURL].ref.auth().onAuthStateChanged(function(user) {
+					callback(user);
+				})
+			};
+			
+			var viewUser = function viewUser(dbURL, callback){
+				var user = apps[dbURL].ref.auth().currentUser;
+			};
+			
+			getUser(config.databaseURL, function (user){
+				if (user){
+					console.log("logged in:", user)
+				}
+				else{
+					console.log("logged out")
+				}
+			});
+			
+			viewUser(config.databaseURL, function (user){
+				if (user){
+					console.log("logged in view:", user)
+				}
+				else{
+					console.log("logged out view")
+				}
+			});
+			
 			/*
 			// Initialize another app with a different config
 			var otherApp = firebase.initializeApp(otherAppConfig, "other");
