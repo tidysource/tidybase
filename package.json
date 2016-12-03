@@ -1,0 +1,22 @@
+{
+  "name": "tidybase",
+  "version": "0.1.0",
+  "description": "tidybase",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tidysource/tidybase.git"
+  },
+  "author": "Daniel Cobo",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/tidysource/tidybase/issues"
+  },
+  "homepage": "https://github.com/tidysource/tidybase#readme",
+  "devDependencies": {
+    "tape": "^4.6.3"
+  }
+}
