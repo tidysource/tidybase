@@ -13,8 +13,7 @@
 	<body>
 		<script src="https://www.gstatic.com/firebasejs/3.6.1/firebase.js"></script>
 
-		<script src="./js/data/firebaseInit.js"></script>
-		<script src="./js/data/user.js"></script>
+		<script src="./js/data/config.js"></script>
 
 		<script src="https://www.gstatic.com/firebasejs/3.6.1/firebase-app.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/3.6.1/firebase-auth.js"></script>
@@ -24,105 +23,5 @@
 		<!-- Leave out Storage -->
 		<!-- <script src="https://www.gstatic.com/firebasejs/3.6.1/firebase-storage.js"></script> -->
 		
-		<script>
-			//Returns a new Firebase reference
-			var apps = false; //Holds all initialised dbs
-			
-			var appInit = function appInit(param){
-				var ref = null;
-				
-				if (apps === false){
-					apps = {};
-				}
-				if (!apps[param.databaseURL]){
-					ref = firebase.initializeApp(param, param.databaseURL);
-					apps[param.databaseURL] = {ref: ref};
-				}
-				/*
-				NOTE: 
-				There is no "default" db
-				*/
-			};
-			
-			// Initialize the default app
-			appInit(config); //var config defined in js/firebaseInit.js
-			
-			var getUser = function getUser(dbURL, callback){
-				var user = apps[dbURL].ref.auth().currentUser;
-				callback(user);
-			};
-			
-			var viewUser = function viewUser(dbURL, callback){
-				apps[dbURL].ref.auth().onAuthStateChanged(function(user) {
-					callback(user);
-				})
-			};
-			
-			getUser(config.databaseURL, function (user){
-				if (user){
-					console.log("logged in:", user)
-				}
-				else{
-					console.log("logged out")
-				}
-			});
-			
-			viewUser(config.databaseURL, function (user){
-				if (user){
-					console.log("logged in:", user)
-				} 
-				else{
-					console.log("logged out")
-				}
-			});
-			
-						
-			var updateUser = function updateUser(obj){
-				getUser(config.databaseURL, function(user){
-					if (user){
-						user.updateProfile(obj)
-							.then(
-								function(){	
-									//Success
-									console.log("updated")
-								}, 
-								function(error){	
-									//Error
-									console.log("Update failed")
-							});
-					}
-				});
-			};
-			
-			updateUser({displayName: "Tidy Source"})
-			
-			//email and password vars defined in user.js
-			//Create user
-			apps[config.databaseURL].ref.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
-			  // Handle Errors here.
-			  var errorCode = error.code;
-			  var errorMessage = error.message;
-			  console.log(error)
-			  // ...
-			});
-			
-			//Sign in
-			apps[config.databaseURL].ref.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
-				// Handle Errors here.
-				var errorCode = error.code;
-				var errorMessage = error.message;
-				console.log(error)
-			});
-			
-			//Sign out
-			apps[config.databaseURL].ref.auth().signOut().then(function() {
-												// Sign-out successful.
-												console.log("Signed out.")
-											},
-											function(error) {
-												// An error happened.
-												console.log(error)
-											});
-		</script>
 	</body>
 </html>
