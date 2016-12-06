@@ -5,7 +5,7 @@ Imports
 =======
 */
 	//Official Firebase SDK
-	var firebase = require("firebase");
+	var firebase = require('firebase');
 
 /*
 Helper functions
@@ -44,7 +44,7 @@ Init
 
 			if (!app.list[dbURL]){
 				var ref = firebase.initializeApp(config, dbURL);
-				//NOTE: There is no "default" app
+				//NOTE: There is no 'default' app
 				app.list[dbURL] = {ref: ref};
 			}
 			
@@ -58,9 +58,9 @@ Init
 		var getApp = function getApp(dbURL){
 			var ref = app.list[dbURL];
 			if (!ref){
-				var err = ["App '",
+				var err = ['App '',
 							dbURL,
-							"' not initialised."
+							'' not initialised.'
 							].join('');
 				throw new Error(err);
 			}
@@ -75,7 +75,7 @@ Init
 		@param - dbURL [string] or config [object]
 		*/
 		var app = function app(param){
-			if (typeof param === "string"){
+			if (typeof param === 'string'){
 				//dbURL === param
 				return getApp(param).ref;
 			}
@@ -109,7 +109,7 @@ Users
 			handleCallback(user, callback);
 		}
 		else{
-			handleError("No user", fail);
+			handleError('No user', fail);
 		}
 	};
 	
@@ -122,7 +122,7 @@ Users
 					handleCallback(user, callback);
 				}
 				else{
-					handleError("No user", fail);
+					handleError('No user', fail);
 				}
 			});
 	};
