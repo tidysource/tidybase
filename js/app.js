@@ -58,9 +58,9 @@ Return app object of initialised app
 var getApp = function getApp(dbURL){
 	var ref = app.list[dbURL];
 	if (!ref){
-		var err = ['App '',
+		var err = ['App "',
 					dbURL,
-					'' not initialised.'
+					'" not initialised.'
 					].join('');
 		throw new Error(err);
 	}
@@ -103,7 +103,7 @@ app.addUser = function addUser(dbURL, user, callback, fail){
 };
 
 //For internal use (not to handle login/logout)
-app.getUser = function getUser(dbURL, callback){
+app.getUser = function getUser(dbURL, callback, fail){
 	var user = app(dbURL).auth().currentUser;
 	if (user){
 		handleCallback(user, callback);
@@ -114,7 +114,7 @@ app.getUser = function getUser(dbURL, callback){
 };
 
 //To handle login/logout
-app.watchUser = function watchUser(dbURL, callback){
+app.watchUser = function watchUser(dbURL, callback, fail){
 	app(dbURL)
 		.auth()
 		.onAuthStateChanged(function (user){
