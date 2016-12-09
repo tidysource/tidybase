@@ -11,6 +11,15 @@ var firebase = require('firebase');
 Helper functions
 ================
 */
+var defined = function defined(param){
+	if (typeof param === 'undefined'){
+		return false;
+	}
+	else{
+		return true;
+	}
+}
+
 var handleCallback = function handleCallback(param, callback){
 	if (arguments.length === 2){
 		callback(param);
@@ -19,7 +28,7 @@ var handleCallback = function handleCallback(param, callback){
 		//callback = param;
 		param();
 	}
-}
+};
 
 var handleError = function handleError(error, fail){
 	if (typeof fail === 'function'){
@@ -28,7 +37,51 @@ var handleError = function handleError(error, fail){
 	else{
 		throw new Error(error);
 	}
-}
+};
+
+var parsePath = function parsePath(grossPath){
+	//dbURL up to second / (first one is part of protocol)
+	var dbURL = /^[^/]+\/+[^/]+/.exec(grossPath)[0]; //
+	return {
+			dbURL : dbURL,
+			netPath : grossPath.slice(dbURL.length)
+			};
+};
+
+var ref = function ref(dbPath){	
+	if (dbPath.at){
+		dbPath = dbPath.at; 	
+	}
+	
+	var parsedPaths = parsePath(dbPath);
+	var netPath = parsedPaths.netPath;
+	var dbURL = parsedPaths.dbURL;
+
+	var query = app(dbURL).database().ref(netPath);
+		
+	if (dbPath.at){
+		if (defined(param.limitToFirst)){ 
+			query = query.limitToFirst(param.limitToFirst); 
+		}
+		else if (defined(param.limitToLast)){ 
+			query = query.limitToLast(param.limitToLast); 
+		}
+
+		if (defined(param.equalTo)){ 
+			query = query.equalTo(param.equalTo);
+		}
+		else{
+			if (defined(param.startAt)){ 
+				query = query.startAt(param.startAt);
+			}
+			if (defined(param.endAt)){ 
+				query = query.endAt(param.endAt);
+			}	
+		}
+	}
+	
+	return query;
+};
 
 /*
 Init
@@ -219,6 +272,93 @@ app.reauthUser = function reauthUser(dbURL, credentials, callback, fail){
 	});
 };
 
+/*
+Read & Write
+============
+*/
+app.set = function set(dbPath, val, callback, fail){
+	ref(dbPath)
+		.set(val)
+		.then(
+			function(){ handleCallback(callback); },
+			function(error){ handleError(error, fail); }
+			);
+};
+
+app.push = function push(dbPath, val, callback, fail){
+	ref(dbPath)
+		.push(val)
+		.then(
+			function(){ handleCallback(callback); },
+			function(error){ handleError(error, fail); }
+			);
+};
+
+//Return a UUID
+app.uuid = function(dbPath){
+	return ref(dbPath).push().key();
+};
+
+//Updates are transactional (either all succedd or all fail)
+app.update = function update(dbPath, val, callback, fail){
+	ref(dbPath)
+		.update(val)
+		.then(
+			function(val){ handleCallback(val, callback); },
+			function(error){ handleError(error, fail); }
+			);
+};
+
+//To get val use snapshot.val() in callback
+app.get = function get(dbPath, callback, fail){
+	ref(dbPath)
+		.once('value')
+		.then(
+			function(snapshot){ handleCallback(snapshot, callback); },
+			function(error){ handleError(error, fail); }
+			);
+};
+
+app.remove = function remove(dbPath, callback, fail){
+	ref(dbPath)
+		.remove()
+		.then(
+			function(){ handleCallback(callback); },
+			function(error){ handleError(error, fail); }
+			);
+};
+
+app.transaction = function transaction(dbPath, updates, callback, fail){
+	ref(dbPath)
+		.transaction(updates)
+		.then(
+			function(){ handleCallback(callback); },
+			function(error){ handleError(error, fail); }
+			);
+};
+
+/*
+Events
+======
+*/
+app.on = function get(dbPath, e, callback, fail){
+	ref(dbPath)
+		.on(e)
+		.then(
+			function(snapshot){ handleCallback(snapshot, callback); },
+			function(error){ handleError(error, fail); }
+			);
+};
+
+app.off = function off(dbPath, e, callback, fail){
+	ref(dbPath)
+		.off(e)
+		.then(
+			function(snapshot){ handleCallback(snapshot, callback); },
+			function(error){ handleError(error, fail); }
+			);
+};
+//<--- handle disconnect event https://firebase.google.com/docs/database/web/offline-capabilities
 /*
 Exports
 =======

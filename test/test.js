@@ -116,3 +116,59 @@ test('Remove user - app.removeUser', function (assert){
 		});
 	});
 });
+
+//-----READ & WRITE + EVENTS-----
+
+var dataList = [
+				{hello: "world"},
+				0,
+				"foo"
+				];
+
+var dataInt = 0;
+var dataStr = "bar";
+var dataObj = {hello:"world"};
+
+test('Write data - app.set', function (assert){
+    assert.plan(3);
+        
+	app.set(dbURL + '/test/int', dataInt, function(){
+		assert.ok(true, 'Integer written.');
+	});	
+	
+	app.set(dbURL + '/test/str', dataStr, function(){
+		assert.ok(true, 'String written.');
+	});	
+
+	app.set(dbURL + '/test/obj', dataObj, function(){
+		assert.ok(true, 'Object written.');
+	});
+});
+
+test('Read data - app.get', function (assert){
+	assert.plan(4);
+        
+    app.get(dbURL + '/test/int', function(snapshot){
+	    assert.equal(snapshot.val(), dataInt, 'Read integer.');
+    });	
+    
+    app.get(dbURL + '/test/str', function(snapshot){
+	    assert.equal(snapshot.val(), dataStr, 'Read string.');
+    });	
+
+    app.get(dbURL + '/test/obj', function(snapshot){
+	    assert.deepEqual(snapshot.val(), dataObj, 'Read object.');
+    });	
+    
+    app.get(dbURL + '/test/int/', function(snapshot){
+	    assert.equal(snapshot.val(), dataInt, 'Read with / at end.');
+    });	
+});
+
+/*
+Disconnect from Firebase
+https://github.com/substack/tape/issues/216
+*/
+test.onFinish(function() { 
+  process.exit(0)
+});
