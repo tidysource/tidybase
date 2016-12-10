@@ -149,7 +149,7 @@ test('Read data - app.get', function (assert){
 	assert.plan(4);
         
     app.get(dbURL + '/test/int', function(snapshot){
-	    assert.equal(snapshot.val(), dataInt, 'Read integer.');
+	    assert.equal(snapshot.val(), dataInt, 'Read number.');
     });	
     
     app.get(dbURL + '/test/str', function(snapshot){
@@ -164,6 +164,53 @@ test('Read data - app.get', function (assert){
 	    assert.equal(snapshot.val(), dataInt, 'Read with / at end.');
     });	
 });
+
+test('Update data - app.update', function (assert){
+	assert.plan(2);
+    
+    app.update(dbURL + '/test/', {'int' : 100}, function(){
+		assert.ok(true, 'Updated value.');
+		app.get(dbURL + '/test/int', function(snapshot){
+		    assert.equal(snapshot.val(), 100, 'Update value verified.');
+		});		  
+    });
+});
+
+test('Push data - app.push', function (assert){
+	assert.plan(dataList.length);
+        
+    for(var i=0; i<dataList.length; ++i){    
+	    let val = dataList[i];
+		app.push(dbURL + '/test/list/', val, function(){
+			assert.ok(true, 'Pushed ' + typeof val + '.');
+	 	});
+    }
+});
+
+test('UUID - app.uuid', function (assert){
+	assert.plan(2);
+        
+    var id = app.uuid(dbURL + '/test/list/');
+	app.set(dbURL + '/test/list/' + id, 'uuid', function(){
+		assert.ok(true, 'Object written.');
+		app.get(dbURL + '/test/list/' + id, function(snapshot){
+		    assert.equal(snapshot.val(), 'uuid', 'UUID used.');
+		});
+	});
+});
+
+test('Remove data - app.remove', function (assert){
+	assert.plan(2);
+	
+	app.remove(dbURL + '/test/', function(snapshot){
+	    assert.ok(true, 'Data removed.');
+		app.get(dbURL + '/test/', function(snapshot){
+		    assert.equal(snapshot.val(), null,'Data removed - verified.');
+		});    
+	});	
+});
+
+//<---on, off, transaction, verify push (use on?), handle fails
 
 /*
 Disconnect from Firebase
