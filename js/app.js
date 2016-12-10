@@ -5,7 +5,9 @@ Imports
 =======
 */
 //Official Firebase SDK
-var firebase = require('firebase');
+if (typeof require !== 'undefined'){//Enables use outside Node
+	var firebase = require('firebase');
+}
 
 /*
 Helper functions
