@@ -111,9 +111,9 @@ Return app object of initialised app
 var getApp = function getApp(dbURL){
 	var ref = app.list[dbURL];
 	if (!ref){
-		var err = ['App "',
-					dbURL,
-					'" not initialised.'
+		var err = ['App "',dbURL,'" ',
+					'not initialised. '
+					'Call app(cofnig).'
 					].join('');
 		throw new Error(err);
 	}
