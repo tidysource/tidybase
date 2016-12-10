@@ -298,7 +298,7 @@ app.push = function push(dbPath, val, callback, fail){
 
 //Return a UUID
 app.uuid = function(dbPath){
-	return ref(dbPath).push().key();
+	return ref(dbPath).push().key;
 };
 
 //Updates are transactional (either all succedd or all fail)
@@ -361,6 +361,7 @@ app.off = function off(dbPath, e, callback, fail){
 			);
 };
 //<--- handle disconnect event https://firebase.google.com/docs/database/web/offline-capabilities
+//<--- Errors are being swollowed in .then (need something like done or return the promises)
 /*
 Exports
 =======
