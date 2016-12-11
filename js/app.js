@@ -100,10 +100,25 @@ var initApp = function initApp(config){
 	if (!app.list[dbURL]){
 		var ref = firebase.initializeApp(config, dbURL);
 		//NOTE: There is no 'default' app
-		app.list[dbURL] = {ref: ref};
+		app.list[dbURL] = {
+							ref: ref, 
+							events: {}
+							};
 	}
 	
 	return app.list[dbURL];
+};
+
+var appEvent = function appEvent(e, eVal){
+	if (e && eVal){
+		app.list[dbURL].events[e] = eVal;
+	}
+	else if (e){
+		app.list[dbURL].events[e]();
+	}
+	else{
+		throw new Error('Event is a requered parameter.');
+	}
 };
 
 /*
@@ -161,20 +176,6 @@ app.addUser = function addUser(dbURL, user, callback, fail){
 app.getUser = function getUser(dbURL, callback){
 	var user = app(dbURL).auth().currentUser;
 	callback(user);
-};
-
-//To handle login/logout
-app.watchUser = function watchUser(dbURL, callback, fail){
-	app(dbURL)
-		.auth()
-		.onAuthStateChanged(function (user){
-			if (user){
-				handleCallback(user, callback);
-			}
-			else{
-				handleError('No user', fail);
-			}
-		});
 };
 	
 app.updateUser = function updateUser(dbURL, profile, callback, fail){
@@ -338,22 +339,62 @@ app.transaction = function transaction(dbPath, updates, callback, fail){
 Events
 ======
 */
+//TO-DO based on Note: callback is requiered, fail callback is not, default --> throw 
 app.on = function get(dbPath, e, callback, fail){
-	ref(dbPath)
-		.on(e)
-		.then(
-			function(snapshot){ handleCallback(snapshot, callback); },
-			function(error){ handleError(error, fail); }
-			);
+	if (e === 'loginLogout'){
+		var dbURL = parsePath(dbPath).dbURL;
+		var authOff = app(dbURL)
+						.auth()
+						.onAuthStateChanged(
+							//On current user value change
+							function (user){
+								if (callback){
+									callback(user);
+								}
+							},
+							//Auth fail
+							function(error){
+								if (fail){
+									fail(error);
+								}
+							});
+		appEvent('authOff',authOff);
+	};
+	else{
+		/*
+		NOTE:
+		Return is so you can call off the event with an
+		inline callback function (onCallback in app.off)
+		*/
+		return ref(dbPath)
+				.on(e,
+					//On event
+					function(snapshot){
+						if (callback){ 
+							callback(snapshot);
+						}
+					},
+					//Subscription fail
+					function(error){
+						if (fail){
+							fail(error);
+						}	
+					})	
+	}
 };
 
-app.off = function off(dbPath, e, callback, fail){
-	ref(dbPath)
-		.off(e)
-		.then(
-			function(snapshot){ handleCallback(snapshot, callback); },
-			function(error){ handleError(error, fail); }
-			);
+app.off = function off(dbPath, e, onCallback){
+	if (e === 'loginLogout'){
+		appEvent('authOff');
+	}
+	else{
+		if (onCallback){
+			ref(dbPath).off(e, onCallback);
+		}
+		else{
+			ref(dbPath).off(e);	
+		}	
+	}
 };
 //<--- handle disconnect event https://firebase.google.com/docs/database/web/offline-capabilities
 //<--- Errors are being swollowed in .then (need something like done or return the promises)
