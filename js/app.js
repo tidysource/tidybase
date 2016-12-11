@@ -339,7 +339,8 @@ app.transaction = function transaction(dbPath, updates, callback, fail){
 Events
 ======
 */
-//TO-DO based on Note: callback is requiered, fail callback is not, default --> throw 
+//TO-DO: default fail callback should throw error
+//Note: callback is requiered, fail callback is not
 app.on = function get(dbPath, e, callback, fail){
 	if (e === 'loginLogout'){
 		var dbURL = parsePath(dbPath).dbURL;
@@ -359,8 +360,12 @@ app.on = function get(dbPath, e, callback, fail){
 								}
 							});
 		appEvent('authOff',authOff);
-	};
+	}
 	else{
+		//Events name confrom to camelCase
+		e = replace(/[A-Z]/g, function(str){
+			return '_' + str.toLowerCase();
+		});
 		/*
 		NOTE:
 		Return is so you can call off the event with an
