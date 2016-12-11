@@ -172,72 +172,64 @@ app.addUser = function addUser(dbURL, user, callback, fail){
 			);
 };
 
-//For internal use (not to handle login/logout)//<--- do not make promise, instead just make chainable
-app.getUser = function getUser(dbURL, callback){
-	var user = app(dbURL).auth().currentUser;
-	callback(user);
+//For internal use (not to handle login/logout)
+app.getUser = function getUser(dbURL){
+	return app(dbURL).auth().currentUser;
 };
 	
 app.updateUser = function updateUser(dbURL, profile, callback, fail){
-	app.getUser(dbURL, function(user){
-		user.updateProfile(profile)
-			.then(
-				function(){ handleCallback(callback); },
-				function(error){ handleError(error, fail); }
-				);
-	});
+	var user = app.getUser(dbURL);
+	user.updateProfile(profile)
+		.then(
+			function(){ handleCallback(callback); },
+			function(error){ handleError(error, fail); }
+			);
 };
 
 app.updateUserEmail = function updateUserEmail(dbURL, email, callback, fail){
-	app.getUser(dbURL, function(user){
-		user.updateEmail(email)
-			.then(
-				function(){ handleCallback(callback); },
-				function(error){ handleError(error, fail); }
-				);
-	});
+	var user = app.getUser(dbURL);
+	user.updateEmail(email)
+		.then(
+			function(){ handleCallback(callback); },
+			function(error){ handleError(error, fail); }
+			);
 };
 
 app.updateUserPassword = function updateUserPassword(dbURL, password, callback, fail){
-	app.getUser(dbURL, function(user){
-		user.updatePassword(password)
-			.then(
-				function(){ handleCallback(callback); },
-				function(error){ handleError(error, fail); }
-				);
-	});
+	var user = app.getUser(dbURL);
+	user.updatePassword(password)
+		.then(
+			function(){ handleCallback(callback); },
+			function(error){ handleError(error, fail); }
+			);
 };
 
 app.userEmailVerification = function userEmailVerification(dbURL, callback, fail){
-	app.getUser(dbURL, function(user){
-		user.sendEmailVerification()
-			.then(
-				function(){ handleCallback(callback); },
-				function(error){ handleError(error, fail); }
-				);
-	});
+	var user = app.getUser(dbURL);
+	user.sendEmailVerification()
+		.then(
+			function(){ handleCallback(callback); },
+			function(error){ handleError(error, fail); }
+			);
 };
 
 app.userEmailResetPassword = function userEmailResetPassword(dbURL, email, callback, fail){
-	app.getUser(dbURL, function(user){
-		app(dbURL)
-			.auth()
-			.sendPasswordResetEmail(email)
-			.then(
-				function(){ handleCallback(callback); },
-				function(error){ handleError(error, fail); }
-				);
-	});
+	app(dbURL)
+		.auth()
+		.sendPasswordResetEmail(email)
+		.then(
+			function(){ handleCallback(callback); },
+			function(error){ handleError(error, fail); }
+			);
 };
 
 app.removeUser = function removeUser(dbURL, callback, fail){
-	app.getUser(dbURL, function (user){
-		user.delete()
-			.then(
-				function(){ handleCallback(callback); },
-				function(error){ handleError(error, fail); }
-				);
-	});
+	var user = app.getUser(dbURL);
+	user.delete()
+		.then(
+			function(){ handleCallback(callback); },
+			function(error){ handleError(error, fail); }
+			);
 };
 
 app.loginUser = function loginUser(dbURL, user, callback, fail){
@@ -261,13 +253,12 @@ app.logoutUser = function logoutUser(dbURL, callback, fail){
 };
 
 app.reauthUser = function reauthUser(dbURL, credentials, callback, fail){
-	app.getUser(dbURL, function(user){
-		user.reauthenticate(credentials)
-			.then(
-				function(){ handleCallback(callback); },
-				function(error){ handleError(error, fail); }
-				);
-	});
+	var user = app.getUser(dbURL);
+	user.reauthenticate(credentials)
+		.then(
+			function(){ handleCallback(callback); },
+			function(error){ handleError(error, fail); }
+			);
 };
 
 /*
