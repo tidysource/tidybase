@@ -56,9 +56,7 @@ test('Login user - app.loginUser', function (assert){
 test('Get user object - app.getUser', function (assert){
     assert.plan(1);
 
-	app.getUser(dbURL, function(user){
-		assert.ok(user, 'Got user object.');
-	});
+	assert.ok(app.getUser(dbURL), 'Got user object.');
 });
 
 test('Update user - app.updateUser', function (assert){
@@ -66,9 +64,8 @@ test('Update user - app.updateUser', function (assert){
 
 	app.updateUser(dbURL, profile, function(){
 		assert.ok(true, 'Update user profile.');
-		app.getUser(dbURL, function(user){
-			assert.ok(user.displayName === profile.displayName, 'Update user profile - verified.');
-		});
+		var user = app.getUser(dbURL)
+		assert.ok(user.displayName === profile.displayName, 'Update user profile - verified.');
 	});
 });
 
