@@ -157,15 +157,10 @@ app.addUser = function addUser(dbURL, user, callback, fail){
 			);
 };
 
-//For internal use (not to handle login/logout)
-app.getUser = function getUser(dbURL, callback, fail){
+//For internal use (not to handle login/logout)//<--- do not make promise, instead just make chainable
+app.getUser = function getUser(dbURL, callback){
 	var user = app(dbURL).auth().currentUser;
-	if (user){
-		handleCallback(user, callback);
-	}
-	else{
-		handleError('No user', fail);
-	}
+	callback(user);
 };
 
 //To handle login/logout
