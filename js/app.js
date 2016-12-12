@@ -257,7 +257,7 @@ app.on = function get(dbPath, e, callback, fail){
 	}
 	else{
 		//Events name confrom to camelCase
-		e = replace(/[A-Z]/g, function(str){
+		e = e.replace(/[A-Z]/g, function(str){
 			return '_' + str.toLowerCase();
 		});
 		/*
