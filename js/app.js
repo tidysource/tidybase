@@ -306,7 +306,6 @@ app.off = function off(dbPath, e, onCallback){
 	}
 };
 //<--- handle disconnect event https://firebase.google.com/docs/database/web/offline-capabilities
-//<--- Errors are being swollowed in .then (need something like done or return the promises)
 /*
 Exports
 =======
