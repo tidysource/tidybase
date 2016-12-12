@@ -283,16 +283,26 @@ app.on = function get(dbPath, e, callback, fail){
 };
 
 app.off = function off(dbPath, e, onCallback){
+	var callback = onCallback;
+	if (typeof e === 'function'){
+		callback = e;
+	}
+
 	if (e === 'loginLogout'){
 		appEvent('authOff');
 	}
 	else{
-		if (onCallback){
-			ref(dbPath).off(e, onCallback);
+		if (typeof e === string){
+			if (callback){
+				ref(dbPath).off(e, callback);
+			}
+			else{
+				ref(dbPath).off(e);
+			}
 		}
 		else{
-			ref(dbPath).off(e);	
-		}	
+			ref(dbPath).off();
+		}
 	}
 };
 //<--- handle disconnect event https://firebase.google.com/docs/database/web/offline-capabilities
