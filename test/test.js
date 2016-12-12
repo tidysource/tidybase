@@ -32,25 +32,31 @@ test('Initialise app - app', function (assert){
 test('Create new user - app.addUser', function (assert){
     assert.plan(1);
 
-	app.addUser(dbURL, credentials[0], function(){
-		assert.ok(true, 'Created new user.');
-	});
+	app.addUser(dbURL, credentials[0])
+		.then(
+			function(){assert.ok(true, 'Created new user.');},
+			function(error){assert.fail(error);}
+			);
 });
 
 test('Logout user - app.logoutUser', function (assert){
     assert.plan(1);
 
-	app.logoutUser(dbURL, function(){
-		assert.ok(true, 'Logged out user.');
-	});
+	app.logoutUser(dbURL)
+		.then(
+			function(){assert.ok(true, 'Logged out user.');},
+			function(error){assert.fail(error);}
+			);
 });
 
 test('Login user - app.loginUser', function (assert){
     assert.plan(1);
 
-	app.loginUser(dbURL, credentials[0], function(){
-		assert.ok(true, 'Logged in user.');
-	});
+	app.loginUser(dbURL, credentials[0])
+		.then(
+			function(){assert.ok(true, 'Logged in user.');},
+			function(error){assert.fail(error);}
+			);
 });
 
 test('Get user object - app.getUser', function (assert){
@@ -62,56 +68,81 @@ test('Get user object - app.getUser', function (assert){
 test('Update user - app.updateUser', function (assert){
     assert.plan(2);
 
-	app.updateUser(dbURL, profile, function(){
-		assert.ok(true, 'Update user profile.');
-		var user = app.getUser(dbURL)
-		assert.ok(user.displayName === profile.displayName, 'Update user profile - verified.');
-	});
+	app.updateUser(dbURL, profile)
+		.then(
+			function(){assert.ok(true, 'Update user profile.')},
+			function(error){assert.fail(error);}
+			)
+		.then(function(){
+			var user = app.getUser(dbURL)
+			assert.ok(user.displayName === profile.displayName, 
+			'Update user profile - verified.');
+		});
 });
 
 test('Update user email - app.updateUserEmail', function (assert){
     assert.plan(3);
 
-	app.updateUserEmail(dbURL, credentials[1].email, function(){
-		assert.ok(true, 'Changed user email.');
-		app.logoutUser(dbURL, function(){
-			assert.ok(true, 'Logged out.');
-			app.loginUser(dbURL, 
-							{
-							email : credentials[1].email,
-							password : credentials[0].password
-							}, 
-							function(){
-								assert.ok(true, 'Logged in with new email.');
-							});
-		});
-	});
+	app.updateUserEmail(dbURL, credentials[1].email)
+		.then(
+			function(){assert.ok(true, 'Changed user email.');},
+			function(error){assert.fail(error);})
+		.then(
+			function(){
+				return app.logoutUser(dbURL);
+			})
+		.then(
+			function(){assert.ok(true, 'Logged out.');},
+			function(error){assert.fail(error);})
+		.then(
+			function(){
+				return app.loginUser(dbURL, 
+											{
+											email : credentials[1].email,
+											password : credentials[0].password
+											});
+			})
+		.then(
+			function(){assert.ok(true, 'Logged in with new email.');},
+			function(error){assert.fail(error);});
 });
 
 test('Update user password - app.updateUserPassword', function (assert){
     assert.plan(3);
 	
-	app.updateUserPassword(dbURL, credentials[1].password, function(){
-		assert.ok(true, 'Changed user password.');
-		app.logoutUser(dbURL, function(){
-			assert.ok(true, 'Logged out.');
-			app.loginUser(dbURL,credentials[1],function(){
-				assert.ok(true, 'Logged in with new password.');
-			});
-		});
-	});
+	app.updateUserPassword(dbURL, credentials[1].password)
+		.then(
+			function(){assert.ok(true, 'Changed user password.');},
+			function(error){assert.fail(error);})
+		.then(
+			function(){
+				return app.logoutUser(dbURL)
+			})
+		.then(
+			function(){assert.ok(true, 'Logged out.');},
+			function(error){assert.fail(error);})
+		.then(
+			function(){
+				return app.loginUser(dbURL,credentials[1])
+			})
+		.then(
+			function(){assert.ok(true, 'Logged in with new password.');},
+			function(error){assert.fail(error);});
 });
 
 test('Remove user - app.removeUser', function (assert){
     assert.plan(2);
 
-	app.removeUser(dbURL, function(){
-		assert.ok(true, 'User removed.');
-		
-		app.loginUser(dbURL,credentials[1],null,function(error){
-			assert.ok(error, 'User removed - verified.');
-		});
-	});
+	app.removeUser(dbURL)
+		.then(
+			function(){assert.ok(true, 'User removed.');},
+			function(error){assert.fail(error);})
+		.then(function(){
+			return app.loginUser(dbURL,credentials[1]);
+		})
+		.then(
+			function(error){assert.fail('User NOT removed.');},
+			function(error){assert.ok(error, 'User removed - verified.');});
 });
 
 //-----READ & WRITE + EVENTS-----
@@ -129,48 +160,87 @@ var dataObj = {hello:"world"};
 test('Write data - app.set', function (assert){
     assert.plan(3);
         
-	app.set(dbURL + '/test/int', dataInt, function(){
-		assert.ok(true, 'Integer written.');
-	});	
+	app.set(dbURL + '/test/int', dataInt)
+		.then(
+			function(){assert.ok(true, 'Integer written.');},
+			function(error){assert.fail(error);}
+			);	
 	
-	app.set(dbURL + '/test/str', dataStr, function(){
-		assert.ok(true, 'String written.');
-	});	
+	app.set(dbURL + '/test/str', dataStr)
+		.then(
+			function(){assert.ok(true, 'String written.');},
+			function(error){assert.fail(error);}
+			);	
 
-	app.set(dbURL + '/test/obj', dataObj, function(){
-		assert.ok(true, 'Object written.');
-	});
+	app.set(dbURL + '/test/obj', dataObj)
+		.then(
+			function(){assert.ok(true, 'Object written.');},
+			function(error){assert.fail(error);}
+			);
 });
 
 test('Read data - app.get', function (assert){
 	assert.plan(4);
         
-    app.get(dbURL + '/test/int', function(snapshot){
-	    assert.equal(snapshot.val(), dataInt, 'Read number.');
-    });	
+    app.get(dbURL + '/test/int')
+    	.then(
+	    	function(snapshot){
+		    	assert.equal(snapshot.val(), dataInt, 
+		    				'Read number.');
+			},
+			function(error){
+				assert.fail(error);
+			});
     
-    app.get(dbURL + '/test/str', function(snapshot){
-	    assert.equal(snapshot.val(), dataStr, 'Read string.');
-    });	
+    app.get(dbURL + '/test/str')
+    	.then(
+	    	function(snapshot){
+		    	assert.equal(snapshot.val(), dataStr, 
+		    				'Read string.');
+			},
+			function(error){
+				assert.fail(error);
+			});
 
-    app.get(dbURL + '/test/obj', function(snapshot){
-	    assert.deepEqual(snapshot.val(), dataObj, 'Read object.');
-    });	
+    app.get(dbURL + '/test/obj')
+    	.then(
+	    	function(snapshot){
+		    	assert.deepEqual(snapshot.val(), dataObj, 
+		    				'Read object.');
+			},
+			function(error){
+				assert.fail(error);
+			});
     
-    app.get(dbURL + '/test/int/', function(snapshot){
-	    assert.equal(snapshot.val(), dataInt, 'Read with / at end.');
-    });	
+    app.get(dbURL + '/test/int/')
+    	.then(
+	    	function(snapshot){
+		    	assert.equal(snapshot.val(), dataInt, 
+		    				'Read width / at end.');
+			},
+			function(error){
+				assert.fail(error);
+			});	
 });
 
 test('Update data - app.update', function (assert){
 	assert.plan(2);
     
-    app.update(dbURL + '/test/', {'int' : 100}, function(){
-		assert.ok(true, 'Updated value.');
-		app.get(dbURL + '/test/int', function(snapshot){
-		    assert.equal(snapshot.val(), 100, 'Update value verified.');
-		});		  
-    });
+    app.update(dbURL + '/test/', {'int' : 100})
+	    .then(
+	    	function(){assert.ok(true, 'Updated value.')},
+			function(error){assert.fail(error);}
+		)
+		.then(function(){
+			return app.get(dbURL + '/test/int');
+		})
+		.then(
+			function(snapshot){
+				assert.equal(snapshot.val(), 100, 'Update value verified.');
+			},
+			function(error){
+				assert.fail(error);
+			});
 });
 
 test('Push data - app.push', function (assert){
@@ -178,9 +248,11 @@ test('Push data - app.push', function (assert){
         
     for(var i=0; i<dataList.length; ++i){    
 	    let val = dataList[i];
-		app.push(dbURL + '/test/list/', val, function(){
-			assert.ok(true, 'Pushed ' + typeof val + '.');
-	 	});
+		app.push(dbURL + '/test/list/', val)
+			.then(
+				function(){assert.ok(true, 'Pushed ' + typeof val + '.');},
+				function(error){assert.fail(error);}
+				);
     }
 });
 
@@ -188,23 +260,42 @@ test('UUID - app.uuid', function (assert){
 	assert.plan(2);
         
     var id = app.uuid(dbURL + '/test/list/');
-	app.set(dbURL + '/test/list/' + id, 'uuid', function(){
-		assert.ok(true, 'Object written.');
-		app.get(dbURL + '/test/list/' + id, function(snapshot){
-		    assert.equal(snapshot.val(), 'uuid', 'UUID used.');
-		});
-	});
+	app.set(dbURL + '/test/list/' + id, 'uuid')
+		.then(
+			function(){assert.ok(true, 'Object written.')},
+			function(error){assert.fail(error);})
+		.then(function(){
+			return app.get(dbURL + '/test/list/' + id);
+		})
+		.then(
+			function(snapshot){
+				assert.equal(snapshot.val(), 
+							'uuid', 'UUID used.');
+			},
+			function(error){
+				assert.fail(error);
+			});
 });
 
 test('Remove data - app.remove', function (assert){
 	assert.plan(2);
 	
-	app.remove(dbURL + '/test/', function(snapshot){
-	    assert.ok(true, 'Data removed.');
-		app.get(dbURL + '/test/', function(snapshot){
-		    assert.equal(snapshot.val(), null,'Data removed - verified.');
-		});    
-	});	
+	app.remove(dbURL + '/test/')
+		.then(
+			function(snapshot){assert.ok(true, 'Data removed.')},
+			function(error){assert.fail(error);}
+			)
+		.then(function(){
+			return app.get(dbURL + '/test/'); 
+		})
+		.then(
+			function(snapshot){
+		    	assert.equal(snapshot.val(), null,
+		    				'Data removed - verified.');
+			},
+			function(error){
+				assert.fail(error);
+			}); 	
 });
 
 //<---on, off, transaction, verify push (use on?), handle fails

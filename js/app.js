@@ -142,12 +142,9 @@ app.list = {};
 /*
 Users
 =====
-*/<------ MAKE EVERYTHING RETURN A PROMISE, FORGET CALLBACK AND FAIL!
+*/
 app.addUser = function addUser(dbURL, user){
-	return
-	app(dbURL)
-		.auth()
-		.createUserWithEmailAndPassword(user.email, user.password);
+	return app(dbURL).auth().createUserWithEmailAndPassword(user.email, user.password);
 };
 
 //For internal use (not to handle login/logout)
@@ -176,10 +173,7 @@ app.userEmailVerification = function userEmailVerification(dbURL){
 };
 
 app.userEmailResetPassword = function userEmailResetPassword(dbURL, email){
-	return 
-	app(dbURL)
-		.auth()
-		.sendPasswordResetEmail(email);
+	return app(dbURL).auth().sendPasswordResetEmail(email);
 };
 
 app.removeUser = function removeUser(dbURL){
@@ -188,10 +182,7 @@ app.removeUser = function removeUser(dbURL){
 };
 
 app.loginUser = function loginUser(dbURL, user){
-	return
-	app(dbURL)
-		.auth()
-		.signInWithEmailAndPassword(user.email, user.password);
+	return app(dbURL).auth().signInWithEmailAndPassword(user.email, user.password);
 };
 
 app.logoutUser = function logoutUser(dbURL){
