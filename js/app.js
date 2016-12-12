@@ -22,25 +22,6 @@ var defined = function defined(param){
 	}
 }
 
-var handleCallback = function handleCallback(param, callback){
-	if (arguments.length === 2){
-		callback(param);
-	}
-	if (arguments.length === 1){
-		//callback = param;
-		param();
-	}
-};
-
-var handleError = function handleError(error, fail){
-	if (typeof fail === 'function'){
-		fail(error);
-	}
-	else{
-		throw new Error(error);
-	}
-};
-
 var parsePath = function parsePath(grossPath){
 	//dbURL up to second / (first one is part of protocol)
 	var dbURL = /^[^/]+\/+[^/]+/.exec(grossPath)[0]; //
@@ -161,15 +142,12 @@ app.list = {};
 /*
 Users
 =====
-*/
-app.addUser = function addUser(dbURL, user, callback, fail){
+*/<------ MAKE EVERYTHING RETURN A PROMISE, FORGET CALLBACK AND FAIL!
+app.addUser = function addUser(dbURL, user){
+	return
 	app(dbURL)
 		.auth()
-		.createUserWithEmailAndPassword(user.email, user.password)
-		.then(
-			function(){ handleCallback(callback); },
-			function(error){ handleError(error, fail); }
-			);
+		.createUserWithEmailAndPassword(user.email, user.password);
 };
 
 //For internal use (not to handle login/logout)
@@ -177,110 +155,64 @@ app.getUser = function getUser(dbURL){
 	return app(dbURL).auth().currentUser;
 };
 	
-app.updateUser = function updateUser(dbURL, profile, callback, fail){
+app.updateUser = function updateUser(dbURL, profile){
 	var user = app.getUser(dbURL);
-	user.updateProfile(profile)
-		.then(
-			function(){ handleCallback(callback); },
-			function(error){ handleError(error, fail); }
-			);
+	return user.updateProfile(profile);
 };
 
-app.updateUserEmail = function updateUserEmail(dbURL, email, callback, fail){
+app.updateUserEmail = function updateUserEmail(dbURL, email){
 	var user = app.getUser(dbURL);
-	user.updateEmail(email)
-		.then(
-			function(){ handleCallback(callback); },
-			function(error){ handleError(error, fail); }
-			);
+	return user.updateEmail(email);
 };
 
-app.updateUserPassword = function updateUserPassword(dbURL, password, callback, fail){
+app.updateUserPassword = function updateUserPassword(dbURL, password){
 	var user = app.getUser(dbURL);
-	user.updatePassword(password)
-		.then(
-			function(){ handleCallback(callback); },
-			function(error){ handleError(error, fail); }
-			);
+	return user.updatePassword(password);
 };
 
-app.userEmailVerification = function userEmailVerification(dbURL, callback, fail){
+app.userEmailVerification = function userEmailVerification(dbURL){
 	var user = app.getUser(dbURL);
-	user.sendEmailVerification()
-		.then(
-			function(){ handleCallback(callback); },
-			function(error){ handleError(error, fail); }
-			);
+	return user.sendEmailVerification();
 };
 
-app.userEmailResetPassword = function userEmailResetPassword(dbURL, email, callback, fail){
+app.userEmailResetPassword = function userEmailResetPassword(dbURL, email){
+	return 
 	app(dbURL)
 		.auth()
-		.sendPasswordResetEmail(email)
-		.then(
-			function(){ handleCallback(callback); },
-			function(error){ handleError(error, fail); }
-			);
+		.sendPasswordResetEmail(email);
 };
 
-app.removeUser = function removeUser(dbURL, callback, fail){
+app.removeUser = function removeUser(dbURL){
 	var user = app.getUser(dbURL);
-	user.delete()
-		.then(
-			function(){ handleCallback(callback); },
-			function(error){ handleError(error, fail); }
-			);
+	return user.delete();
 };
 
-app.loginUser = function loginUser(dbURL, user, callback, fail){
+app.loginUser = function loginUser(dbURL, user){
+	return
 	app(dbURL)
 		.auth()
-		.signInWithEmailAndPassword(user.email, user.password)
-		.then(
-			function(){ handleCallback(callback); },
-			function(error){ handleError(error, fail); }
-			);
+		.signInWithEmailAndPassword(user.email, user.password);
 };
 
-app.logoutUser = function logoutUser(dbURL, callback, fail){
-	app(dbURL)
-		.auth()
-		.signOut()
-		.then(
-			function(){ handleCallback(callback); },
-			function(error){ handleError(error, fail); }
-			);
+app.logoutUser = function logoutUser(dbURL){
+	return app(dbURL).auth().signOut();
 };
 
-app.reauthUser = function reauthUser(dbURL, credentials, callback, fail){
+app.reauthUser = function reauthUser(dbURL, credentials){
 	var user = app.getUser(dbURL);
-	user.reauthenticate(credentials)
-		.then(
-			function(){ handleCallback(callback); },
-			function(error){ handleError(error, fail); }
-			);
+	return user.reauthenticate(credentials);
 };
 
 /*
 Read & Write
 ============
 */
-app.set = function set(dbPath, val, callback, fail){
-	ref(dbPath)
-		.set(val)
-		.then(
-			function(){ handleCallback(callback); },
-			function(error){ handleError(error, fail); }
-			);
+app.set = function set(dbPath, val){
+	return ref(dbPath).set(val);
 };
 
-app.push = function push(dbPath, val, callback, fail){
-	ref(dbPath)
-		.push(val)
-		.then(
-			function(){ handleCallback(callback); },
-			function(error){ handleError(error, fail); }
-			);
+app.push = function push(dbPath, val){
+	return ref(dbPath).push(val);
 };
 
 //Return a UUID
@@ -289,41 +221,21 @@ app.uuid = function(dbPath){
 };
 
 //Updates are transactional (either all succedd or all fail)
-app.update = function update(dbPath, val, callback, fail){
-	ref(dbPath)
-		.update(val)
-		.then(
-			function(val){ handleCallback(val, callback); },
-			function(error){ handleError(error, fail); }
-			);
+app.update = function update(dbPath, val){
+	return ref(dbPath).update(val);
 };
 
 //To get val use snapshot.val() in callback
-app.get = function get(dbPath, callback, fail){
-	ref(dbPath)
-		.once('value')
-		.then(
-			function(snapshot){ handleCallback(snapshot, callback); },
-			function(error){ handleError(error, fail); }
-			);
+app.get = function get(dbPath){
+	return ref(dbPath).once('value');
 };
 
-app.remove = function remove(dbPath, callback, fail){
-	ref(dbPath)
-		.remove()
-		.then(
-			function(){ handleCallback(callback); },
-			function(error){ handleError(error, fail); }
-			);
+app.remove = function remove(dbPath){
+	return ref(dbPath).remove();
 };
 
-app.transaction = function transaction(dbPath, updates, callback, fail){
-	ref(dbPath)
-		.transaction(updates)
-		.then(
-			function(){ handleCallback(callback); },
-			function(error){ handleError(error, fail); }
-			);
+app.transaction = function transaction(dbPath, updates){
+	return ref(dbPath).transaction(updates);
 };
 
 /*
