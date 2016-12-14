@@ -59,3 +59,15 @@ Note:
 In both cases myApp is an app reference.
 */
 ```
+
+### app.getUser()
+Returns the current user object
+| Parameter     | Type     | 
+| ------------- | -------- |
+| dbURL         | `string` |
+
+`dbPath` URL of the database.
+
+```javascript
+var dbURL = 'https://<YOUR_DATABASE_NAME>.firebaseio.com'; 
+var uuid = app(dbPath);
