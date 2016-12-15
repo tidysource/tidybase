@@ -61,7 +61,9 @@ In both cases myApp is an app reference.
 ```
 
 ### app.getUser()
-Returns the current user object
+Returns the current user object. If no user authenticated
+it will return null.
+
 | Parameter     | Type     | 
 | ------------- | -------- |
 | dbURL         | `string` |
@@ -70,4 +72,66 @@ Returns the current user object
 
 ```javascript
 var dbURL = 'https://<YOUR_DATABASE_NAME>.firebaseio.com'; 
-var uuid = app(dbPath);
+var user = app.getUser(dbURL);
+```
+
+### app.uuid()
+Returns a unique key. 
+Returned keys keep a lexicographic order.
+
+| Parameter     | Type     | 
+| ------------- | -------- |
+| dbPath        | `string` |
+
+`dbPath` 
+Path within the database under which 
+the key is going to be applied. Put 
+otherwise, where value will be stored.
+
+```javascript
+var dbPath = 'https://<YOUR_DATABASE_NAME>.firebaseio.com/foo/bar'; 
+var uuid = app.uuid(dbPath);
+```
+
+## Promises
+A useful explanation of [promises][1].
+
+###app.addUser()
+###app.updateUser()
+###app.updateUserEmail()
+###app.updateUserPassword()
+###app.userEmailVerificationr()
+###app.userEmailResetPassword()
+###app.removeUser()
+###app.loginUser()
+###app.logoutUser()
+###app.reauthUser()
+###app.set()
+###app.push()
+###app.update()
+Updates are transactional (either all succedd or all fail)
+###app.get()
+###app.remove()
+###app.transaction()
+
+## Events
+### app.on()
+### app.off()
+
+## Internals
+These functions are **not recommended to be used**.
+They are useful for the wrapper code itself though.
+
+### app.init()
+### app.get()
+### defined()
+### parsePath()
+### ref()
+### app.list
+
+---
+## Notes: 
+Get user returns null and so does getting any value (if nothing is at that path);
+This is not an error, but a valid return value (think template).
+
+[1]:https://developers.google.com/web/fundamentals/getting-started/primers/promises
