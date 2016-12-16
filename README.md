@@ -68,7 +68,7 @@ it will return null.
 | ------------- | -------- |
 | dbURL         | `string` |
 
-`dbPath` URL of the database.
+`dbURL` URL of the database.
 
 ```javascript
 var dbURL = 'https://<YOUR_DATABASE_NAME>.firebaseio.com'; 
@@ -97,6 +97,34 @@ var uuid = app.uuid(dbPath);
 A useful explanation of [promises][1].
 
 ###app.addUser()
+Creates a new user.
+
+| Parameter     | Type     | 
+| ------------- | -------- |
+| dbURL         | `string` |
+| user          | `object` |
+
+`dbURL` URL of the database.
+`user` User object. 
+Should contain e-mail and password properties.
+
+```javascript
+var dbURL = 'https://<YOUR_DATABASE_NAME>.firebaseio.com/';
+var user = {
+			email: '<USER_EMAIL>',
+			password: '<USER_PASSWORD>'
+			};
+
+app.addUser(dbURL)
+	.then(
+		function(){
+			console.log('Created new user.');
+		},
+		function(error){
+			console.error(error);
+		});
+```
+
 ###app.updateUser()
 ###app.updateUserEmail()
 ###app.updateUserPassword()
