@@ -298,7 +298,89 @@ test('Remove data - app.remove', function (assert){
 			}); 	
 });
 
-//<---on, off, transaction, verify push (use on?), handle fails
+test('Events - app.on, app.off', function(assert){
+	assert.plan(5 + //value event
+				3 +	//value added
+				1 +	//value changed
+				1 +	//value moved
+				1 +	//value removed
+				1	//app.off() 
+				);	
+				
+	var listPath = dbURL + '/test/list';
+	
+	app.on(listPath, 'value', function(cSnapshot){
+		assert.ok(true, 'Value event.');
+	});
+	app.on(listPath, 'child_added', function(cSnapshot){
+		assert.ok(true, 'Value added.');
+	});
+	app.on(listPath, 'child_changed', function(cSnapshot){
+		assert.ok(true, 'Value changed.');
+	});
+	app.on({
+			at : listPath,
+			orderBy : 'letter'
+			}, 'child_moved', function(cSnapshot){
+		assert.ok(true, 'Value moved.');
+	});
+	app.on(listPath, 'child_removed', function(cSnapshot){
+		assert.ok(true, 'Value removed.');
+	});
+	
+	//Push data
+	var pushId = null;
+	var pushPath = null;
+	app.push(listPath, {letter : 'a'})
+		.then(
+			function(){
+				return app.push(listPath, {letter : 'b'})
+			},
+			function(error){
+				assert.fail(error);
+			})
+		.then(
+			function(){
+				pushId = app.uuid(listPath);
+				pushPath = listPath + '/' + pushId;
+				return app.set(pushPath, {letter : 'c'});
+			},
+			function(error){
+				assert.fail(error);
+			})
+		//Update list imtem
+		.then(
+			function(){
+				var updatePath = listPath + '/' + pushId + '/' + 'letter';
+				return app.update(updatePath, {letter : 'b'});
+			},
+			function(error){
+				assert.fail(error);
+			})
+		//Remove list item
+		.then(
+			function(){
+				return app.remove(pushPath);
+			},
+			function(error){
+				assert.fail(error);
+			})
+		//Remove listeners
+		.then(
+			function(){
+				app.off(listPath, function(){
+					assert.ok(true, 'Event listeners for ' + dataPath + 'removed.');
+				});
+			},
+			function(error){
+				assert.fail(error);
+			});
+		//Remove list item (to confirm listeners removed) 
+			//If wanted to check if all listeners removed should actually repead pushing and updatint too
+		//Remove test data
+});
+
+//<--- transaction, verify push, handle fails
 
 /*
 Disconnect from Firebase

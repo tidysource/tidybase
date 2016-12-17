@@ -260,6 +260,7 @@ app.on = function get(dbPath, e, callback, fail){
 		e = e.replace(/[A-Z]/g, function(str){
 			return '_' + str.toLowerCase();
 		});
+		//<--- WHAT IF QUERY OBJECT!!!
 		/*
 		NOTE:
 		Return is so you can call off the event with an
