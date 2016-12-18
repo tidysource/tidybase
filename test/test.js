@@ -7,6 +7,14 @@ Imports
 //Test framework
 var test = require('tape');
 
+var colorize = require('tap-colorize');
+var colorizeOptions = {
+	pass : '#B2D9B5',
+	fail : '#FE5A4E',
+	info : '#EEEEEE'
+};
+test.createStream().pipe(colorize(colorizeOptions)).pipe(process.stdout);
+
 //Module to test
 var app = require('../js/app.js');
 
