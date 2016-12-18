@@ -312,19 +312,19 @@ test('Events - app.on, app.off', function(assert){
 	app.on(listPath, 'value', function(cSnapshot){
 		assert.ok(true, 'Value event.');
 	});
-	app.on(listPath, 'child_added', function(cSnapshot){
+	app.on(listPath, 'childAdded', function(cSnapshot){
 		assert.ok(true, 'Value added.');
 	});
-	app.on(listPath, 'child_changed', function(cSnapshot){
+	app.on(listPath, 'childChanged', function(cSnapshot){
 		assert.ok(true, 'Value changed.');
 	});
 	app.on({
 			at : listPath,
 			orderBy : 'letter'
-			}, 'child_moved', function(cSnapshot){
+			}, 'childMoved', function(cSnapshot){
 		assert.ok(true, 'Value moved.');
 	});
-	app.on(listPath, 'child_removed', function(cSnapshot){
+	app.on(listPath, 'childRemoved', function(cSnapshot){
 		assert.ok(true, 'Value removed.');
 	});
 	
@@ -368,9 +368,10 @@ test('Events - app.on, app.off', function(assert){
 		//Remove listeners
 		.then(
 			function(){
-				app.off(listPath, function(){
-					assert.ok(true, 'Event listeners for ' + dataPath + 'removed.');
-				});
+				app.off(listPath, 'value');
+				assert.ok(true, 
+							'Event listeners for ' + 
+							listPath + ' removed.');
 			},
 			function(error){
 				assert.fail(error);
@@ -380,7 +381,7 @@ test('Events - app.on, app.off', function(assert){
 		//Remove test data
 });
 
-//<--- transaction, verify push, handle fails
+//<--- transaction, verify push, handle fails, auth event!!
 
 /*
 Disconnect from Firebase

@@ -31,39 +31,55 @@ var parsePath = function parsePath(grossPath){
 			};
 };
 
-var ref = function ref(dbPath){	
-	if (dbPath.at){
-		dbPath = dbPath.at; 	
+var ref = function ref(param){
+	var dbPath = param;
+	var query = false;
+	if (typeof param === 'object'
+	&& typeof param.at === 'string'){
+		dbPath = param.at
+		query = true;
 	}
 	
 	var parsedPaths = parsePath(dbPath);
 	var netPath = parsedPaths.netPath;
 	var dbURL = parsedPaths.dbURL;
-
-	var query = app(dbURL).database().ref(netPath);
+	
+	var dbRef = app(dbURL).database().ref(netPath);
 		
-	if (dbPath.at){
+	if (query){
+		if (param.orderBy){
+			if (param.orderBy === 'KEY'){
+				dbRef = dbRef.orderByKey();
+			}
+			else if (param.orderBy === 'VALUE'){
+				dbRef = dbRef.orderByValue();
+			}
+			else{ 
+				dbRef = dbRef.orderByChild(param.orderBy);
+			}
+		}
+		
 		if (defined(param.limitToFirst)){ 
-			query = query.limitToFirst(param.limitToFirst); 
+			dbRef = dbRef.limitToFirst(param.limitToFirst); 
 		}
 		else if (defined(param.limitToLast)){ 
-			query = query.limitToLast(param.limitToLast); 
+			dbRef = dbRef.limitToLast(param.limitToLast); 
 		}
 
 		if (defined(param.equalTo)){ 
-			query = query.equalTo(param.equalTo);
+			dbRef = dbRef.equalTo(param.equalTo);
 		}
 		else{
 			if (defined(param.startAt)){ 
-				query = query.startAt(param.startAt);
+				dbRef = dbRef.startAt(param.startAt);
 			}
 			if (defined(param.endAt)){ 
-				query = query.endAt(param.endAt);
+				dbRef = dbRef.endAt(param.endAt);
 			}	
 		}
 	}
 	
-	return query;
+	return dbRef;
 };
 
 /*
@@ -235,7 +251,7 @@ Events
 */
 //TO-DO: default fail callback should throw error
 //Note: callback is requiered, fail callback is not
-app.on = function get(dbPath, e, callback, fail){
+app.on = function on(dbPath, e, callback, fail){
 	if (e === 'loginLogout'){
 		var dbURL = parsePath(dbPath).dbURL;
 		var authOff = app(dbURL)
@@ -260,7 +276,7 @@ app.on = function get(dbPath, e, callback, fail){
 		e = e.replace(/[A-Z]/g, function(str){
 			return '_' + str.toLowerCase();
 		});
-		//<--- WHAT IF QUERY OBJECT!!!
+		
 		/*
 		NOTE:
 		Return is so you can call off the event with an
@@ -284,26 +300,23 @@ app.on = function get(dbPath, e, callback, fail){
 };
 
 app.off = function off(dbPath, e, onCallback){
-	var callback = onCallback;
 	if (typeof e === 'function'){
-		callback = e;
+		onCallback = e;
 	}
 
-	if (e === 'loginLogout'){
-		appEvent('authOff');
-	}
-	else{
-		if (typeof e === string){
-			if (callback){
-				ref(dbPath).off(e, callback);
-			}
-			else{
-				ref(dbPath).off(e);
-			}
+	if (typeof e === 'string'){
+		if (e === 'loginLogout'){
+			appEvent('authOff');
+		}
+		else if (onCallback){
+			ref(dbPath).off(e, onCallback);
 		}
 		else{
-			ref(dbPath).off();
+			ref(dbPath).off(e);
 		}
+	}
+	else{
+		ref(dbPath).off();
 	}
 };
 //<--- handle disconnect event https://firebase.google.com/docs/database/web/offline-capabilities
